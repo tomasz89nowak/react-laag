@@ -157,8 +157,12 @@ export class Bounds implements IBounds {
    * @param environment reference to the window-object (needed when working with iframes for instance). Defaults to `window`
    */
   static fromWindow(environment?: Window): Bounds {
-    const { innerWidth: width = 0, innerHeight: height = 0 } =
-      environment || {};
+    const scrollingElement =
+      environment?.document.scrollingElement ??
+      environment?.document.documentElement;
+    const { clientWidth: width = 0, clientHeight: height = 0 } =
+      scrollingElement ?? {};
+
     return new Bounds({ width, height, right: width, bottom: height });
   }
 
