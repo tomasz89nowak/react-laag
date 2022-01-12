@@ -1,5 +1,6 @@
 {
   "private": true,
+  "name": "react-laag",
   "version": "0.0.0",
   "license": "MIT",
   "workspaces": [
