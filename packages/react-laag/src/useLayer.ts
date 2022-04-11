@@ -150,15 +150,12 @@ export function useLayer({
   // like `useCallback`, without triggering an update
   const lastState = useLastState(state, isOpen);
 
-  // keeps track of scheduled animation-frames
-  const raf = useRef<any>(null);
+  // track invalidations for scheduled position updates
+  const repositioningToken = useRef({ cancelled: false });
   useEffect(() => {
     return () => {
-      // when this hook unmounts, make sure to cancel any scheduled animation-frames
-      if (raf.current) {
-        cancelAnimationFrame(raf.current);
-        raf.current = null;
-      }
+      // when this hook unmounts, make sure to cancel any scheduled position updates
+      repositioningToken.current.cancelled = true;
     };
   }, []);
 
@@ -212,18 +209,18 @@ export function useLayer({
         lastState.current = newState; // optimistically update lastState to prevent infinite loop
 
         /**
-         * We're using requestAnimationFrame-features here to ensure that position updates will
-         * happen max once per frame.
-         * If during a frame there's already an update scheduled, the existing update will be cancelled
-         * and the new update will take precedence.
+         * Throttle state updates slightly by delaying them using an immediately
+         * resolved promise, only applying them if there is no later update.
+         * This helps for multiple updates that happens synchronously one after another.
          */
-        if (raf.current) {
-          cancelAnimationFrame(raf.current);
-        }
+        repositioningToken.current.cancelled = true;
+        const token = { cancelled: false };
+        repositioningToken.current = token;
 
-        raf.current = requestAnimationFrame(() => {
-          setState(newState);
-          raf.current = null;
+        Promise.resolve().then(() => {
+          if (!token.cancelled) {
+            setState(newState);
+          }
         });
       }
 
