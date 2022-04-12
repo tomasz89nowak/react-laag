@@ -3,6 +3,8 @@
   "license": "MIT",
   "name": "react-laag",
   "author": "Erik Verweij",
+  "homepage": "https://www.react-laag.com/",
+  "repository": "everweij/react-laag",
   "module": "dist/react-laag.esm.js",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
