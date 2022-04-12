@@ -106,19 +106,10 @@ export function useHover({
       }
     }
 
-    function onTouchEnd() {
-      if (show) {
-        removeTimeout();
-        setShow(false);
-      }
-    }
-
     window.addEventListener("scroll", onScroll, true);
-    window.addEventListener("touchend", onTouchEnd, true);
 
     return () => {
       window.removeEventListener("scroll", onScroll, true);
-      window.removeEventListener("touchend", onTouchEnd, true);
 
       if (timeout.current) {
         clearTimeout(timeout.current);
