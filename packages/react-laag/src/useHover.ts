@@ -97,7 +97,14 @@ export function useHover({
     }, delayLeave);
   }
 
-  // make sure to clear timeout on unmount
+  // make sure to clear timeout on unmount to avoid performing
+  // a React state update on an unmounted component
+  useEffect(() => {
+    return () => {
+      clearTimeout(timeout.current ?? undefined);
+    };
+  }, []);
+
   useEffect(() => {
     function onScroll() {
       if (show && hideOnScroll) {
@@ -105,15 +112,13 @@ export function useHover({
         setShow(false);
       }
     }
-
+    const currentTimeout = timeout.current;
     window.addEventListener("scroll", onScroll, true);
 
     return () => {
       window.removeEventListener("scroll", onScroll, true);
 
-      if (timeout.current) {
-        clearTimeout(timeout.current);
-      }
+      clearTimeout(currentTimeout ?? undefined);
     };
   }, [show, hideOnScroll, removeTimeout]);
 
